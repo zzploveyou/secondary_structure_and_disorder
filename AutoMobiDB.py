@@ -90,13 +90,16 @@ class AutoMobiDB:
         import threading
         th = []
         for ID in self.IDs:
-            self.log.info("work ID %s start." % ID)
+            self.log.debug("work ID %s start." % ID)
             # 多线程添加下载条目
-            th.append(threading.Thread(target=self.download, args=(ID,)))
-        for t in th:
-            t.start()
-        for t in th:
-            t.join()
+            if len(th) != 8:
+                th.append(threading.Thread(target=self.download, args=(ID,)))
+            else:
+                for t in th:
+                    t.start()
+                for t in th:
+                    t.join()
+                th = []
 
 # json.load(open("filename.json"))
 # json.get('consensus').get('full')
