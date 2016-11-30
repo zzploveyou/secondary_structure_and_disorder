@@ -88,11 +88,14 @@ class AutoMobiDB:
                 f.write(str(result))
             self.log.debug("uniprot json  %s has been downloaded." %
                            os.path.basename(unifile))
+        return ID
+    def callback(self, requests, result):
+        self.log.done("%s done." %(result))
 
     def downloads(self):
         import threadpool
         pool = threadpool.ThreadPool(8)
-        requests = threadpool.makeRequests(self.download, self.IDs)
+        requests = threadpool.makeRequests(self.download, self.IDs, self.callback)
         for req in requests: pool.putRequest(req)
         pool.wait()
 
