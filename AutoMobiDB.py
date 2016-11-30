@@ -88,16 +88,31 @@ class AutoMobiDB:
                 f.write(str(result))
             self.log.debug("uniprot json  %s has been downloaded." %
                            os.path.basename(unifile))
-        return ID
-    def callback(self, requests, result):
-        self.log.done("%s done." %(result))
+            return ID
+        return None
 
-    def downloads(self):
+    def callback(self, requests, result):
+        """callback of download"""
+        if result != None:
+            self.log.done("%s done, download num: %d" %(result, self.num_download))
+
+    def download_all(self):
+        """download all"""
         import threadpool
         pool = threadpool.ThreadPool(8)
         requests = threadpool.makeRequests(self.download, self.IDs, self.callback)
         for req in requests: pool.putRequest(req)
         pool.wait()
+        return True
+
+    def downloads(self):
+        """auto retry"""
+        tag = False
+        while tag != True:
+            try:
+                tag = self.download_all()
+            except Exception as e:
+                pass
 
 # json.load(open("filename.json"))
 # json.get('consensus').get('full')
