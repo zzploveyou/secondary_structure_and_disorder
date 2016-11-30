@@ -32,6 +32,7 @@ class AutoMobiDB:
         if not os.path.exists(self.path_structure):
             self.log.info("make structure dir.")
             os.makedirs(self.path_structure)
+        self.num_download = 0
         self.IDs = []
 
     def getIDs(self, parseType='fasta'):
@@ -73,6 +74,7 @@ class AutoMobiDB:
         disfile = os.path.join(self.path_structure, ID + '_dis.json')
         unifile = os.path.join(self.path_structure, ID + '_uni.json')
         if not os.path.exists(disfile) or os.path.getsize(disfile) == 0:
+            self.num_download += 1
             result = self.getdis(ID)
             with open(disfile, 'w') as f:
                 f.write(str(result))
@@ -80,6 +82,7 @@ class AutoMobiDB:
                            os.path.basename(disfile))
 
         if not os.path.exists(unifile) or os.path.getsize(unifile) == 0:
+            self.num_download += 1
             result = self.getuni(ID)
             with open(unifile, 'w') as f:
                 f.write(str(result))
@@ -109,7 +112,7 @@ def main(fastafile):
 
     end = time.time()
     mylog.info("Total Time: %.2f s" % (end - start))
-    mylog.info("Average Time: %.2f s" % ((end - start) / len(amd.IDs)))
+    mylog.info("Average Time for each download: %.2f s" % ((end - start) / amd.num_download))
     mylog.done("done.")
 
 if __name__ == '__main__':
