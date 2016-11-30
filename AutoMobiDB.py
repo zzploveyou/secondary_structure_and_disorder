@@ -87,19 +87,11 @@ class AutoMobiDB:
                            os.path.basename(unifile))
 
     def downloads(self):
-        import threading
-        th = []
-        for ID in self.IDs:
-            self.log.debug("work ID %s start." % ID)
-            # 多线程添加下载条目
-            if len(th) != 8:
-                th.append(threading.Thread(target=self.download, args=(ID,)))
-            else:
-                for t in th:
-                    t.start()
-                for t in th:
-                    t.join()
-                th = []
+        import threadpool
+        pool = threadpool.ThreadPool(8)
+        requests = threadpool.makeRequests(self.download, self.IDs)
+        for req in requests: pool.putRequest(req)
+        pool.wait()
 
 # json.load(open("filename.json"))
 # json.get('consensus').get('full')
