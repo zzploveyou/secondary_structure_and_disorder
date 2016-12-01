@@ -1,7 +1,7 @@
 # coding:utf-8
 '''
 get secondary structure and disorder info
-using MobiDB
+using d2p2
 '''
 import json
 import os
@@ -9,6 +9,7 @@ import subprocess
 import sys
 import time
 import urllib
+import urllib2
 from optparse import OptionParser
 
 from Bio import SeqIO
@@ -17,7 +18,7 @@ from Bio.Seq import Seq
 import log
 
 
-class AutoMobiDB:
+class Autod2p2:
 
     def __init__(self, log, fastaName):
         """初始化构造函数"""
@@ -28,7 +29,7 @@ class AutoMobiDB:
         self.fastaName = os.path.realpath(fastaName)
         self.log.info("found fastafile: %s" % os.path.basename(self.fastaName))
         self.path = os.path.dirname(self.fastaName)
-        self.path_structure = os.path.join(self.path, "disorder")
+        self.path_structure = os.path.join(self.path, "disorder_d2p2")
         if not os.path.exists(self.path_structure):
             self.log.info("make disorder dir.")
             os.makedirs(self.path_structure)
@@ -44,30 +45,26 @@ class AutoMobiDB:
                 self.IDs.append(ID)
         self.log.info("total numbers: %d" % (len(self.IDs)))
 
-    def getData(self, url):
-        """获取网页数据"""
-        response = urllib.urlopen(url)
-        time.sleep(1)
-        data = json.loads(response.read())
-        return data
-
-    def getdis(self, ID, cool=False):
+    def getdis(self, ID):
         """获取disorder信息"""
-        url = "http://mobidb.bio.unipd.it/ws/entries/%s/disorder" % (ID)
-        data = self.getData(url)
-        if cool:
-            return json.dumps(data, sort_keys=False, indent=4)
+        data = 'seqids=["%s"]' %ID
+        request = urllib2.Request('http://d2p2.pro/api/seqid', data)
+        response = json.loads(urllib2.urlopen(request).read())
+        if response[ID] == []:
+            return ""
         else:
-            return data
+            result = response[ID][0][2]['disorder']['consensus']
+            result = [str(i) for i in result]
+            return " ".join(result)
+
 
     def download(self, ID):
         """对单个ID做处理, 如果不存在或者文件大小为0才会下载, 否则不做处理"""
-        disfile = os.path.join(self.path_structure, ID + '.json')
-        # unifile = os.path.join(self.path_structure, ID + '_uni.json')
+        disfile = os.path.join(self.path_structure, ID + '.txt')
         if not os.path.exists(disfile) or os.path.getsize(disfile) == 0:
             self.num_download += 1
             result = str(self.getdis(ID))
-            if "Error while fetching disorder data" not in result:
+            if result != "":
                 with open(disfile, 'w') as f:
                     f.write(result)
                 return ID
@@ -106,10 +103,10 @@ def main(fastafile):
     start = time.time()
 
     mylog = log.Terminal_log(brief=True)
-    amd = AutoMobiDB(mylog, fastafile)
+    amd = Autod2p2(mylog, fastafile)
     amd.getIDs()
 
-    # 从MobiDB下载fasta中各条序列的disorder, uniprot的json文件
+    # 从d2p2下载fasta中各条序列的disorder, uniprot的json文件
     amd.downloads()
 
     end = time.time()
@@ -118,6 +115,6 @@ def main(fastafile):
     mylog.done("done.")
 
 if __name__ == '__main__':
-    # filename = "/home/zzp/DATABASE/Human/test.fasta"
+    #filename = "/home/zzp/DATABASE/Human/test.fasta"
     filename = "/home/zzp/DATABASE/Human/UP000005640_9606.fasta"
     main(filename)
