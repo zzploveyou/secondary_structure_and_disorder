@@ -38,12 +38,16 @@ class Autod2p2:
 
     def getIDs(self, parseType='fasta'):
         """从fasta格式文件中获取需要的UniProt ID"""
+        n = 0
         for seq_record in SeqIO.parse(self.fastaName, parseType):
+            n += 1
             if len(seq_record.seq) >= 30 and 'X' not in seq_record.seq:
                 ID = seq_record.id.split("|")[1]
                 self.log.debug("ID: %s" % ID)
                 self.IDs.append(ID)
-        self.log.info("total numbers: %d" % (len(self.IDs)))
+        self.log.info("fasta number: %d" %n)
+        self.log.info("total number: %d" % (len(self.IDs)))
+        raw_input()
 
     def getdis(self, ID):
         """获取disorder信息"""
