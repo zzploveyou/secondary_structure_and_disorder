@@ -28,9 +28,9 @@ class AutoMobiDB:
         self.fastaName = os.path.realpath(fastaName)
         self.log.info("found fastafile: %s" % os.path.basename(self.fastaName))
         self.path = os.path.dirname(self.fastaName)
-        self.path_structure = os.path.join(self.path, "structure")
+        self.path_structure = os.path.join(self.path, "disorder")
         if not os.path.exists(self.path_structure):
-            self.log.info("make structure dir.")
+            self.log.info("make disorder dir.")
             os.makedirs(self.path_structure)
         self.num_download = 0
         self.IDs = []
@@ -71,24 +71,17 @@ class AutoMobiDB:
 
     def download(self, ID):
         """对单个ID做处理, 如果不存在或者文件大小为0才会下载, 否则不做处理"""
-        disfile = os.path.join(self.path_structure, ID + '_dis.json')
-        unifile = os.path.join(self.path_structure, ID + '_uni.json')
+        disfile = os.path.join(self.path_structure, ID + '.json')
+        # unifile = os.path.join(self.path_structure, ID + '_uni.json')
         if not os.path.exists(disfile) or os.path.getsize(disfile) == 0:
             self.num_download += 1
-            result = self.getdis(ID)
-            with open(disfile, 'w') as f:
-                f.write(str(result))
-            self.log.debug("disorder json  %s has been downloaded." %
-                           os.path.basename(disfile))
-
-        if not os.path.exists(unifile) or os.path.getsize(unifile) == 0:
-            self.num_download += 1
-            result = self.getuni(ID)
-            with open(unifile, 'w') as f:
-                f.write(str(result))
-            self.log.debug("uniprot json  %s has been downloaded." %
-                           os.path.basename(unifile))
-            return ID
+            result = str(self.getdis(ID))
+            if "Error while fetching disorder data" not in result:
+                with open(disfile, 'w') as f:
+                    f.write(result)
+                return ID
+            else:
+                self.log.warn("cannot fetching ID: %s." %ID)
         return None
 
     def callback(self, requests, result):
@@ -135,5 +128,5 @@ def main(fastafile):
 
 if __name__ == '__main__':
     # filename = "/home/zzp/DATABASE/Human/test.fasta"
-    filename = "/home/zzp/DATABASE/Human/uniprot-human.fasta"
+    filename = "/home/zzp/DATABASE/Human/UP000005640_9606.fasta"
     main(filename)
