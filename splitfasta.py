@@ -36,6 +36,6 @@ def splitfasta(fastafile, sourcedir):
     mylog.done("done.")
 
 if __name__ == '__main__':
-    fastafile = "/home/zzp/DATABASE/Human/UP000005640_9606.fasta"
-    sourcedir = "/home/zzp/DATABASE/Human/sequences/"
+    fastafile = "/home/biolab/zzp/Human/UP000005640_9606.fasta"
+    sourcedir = "/home/biolab/zzp/Human/sequences/"
     splitfasta(fastafile, sourcedir)
