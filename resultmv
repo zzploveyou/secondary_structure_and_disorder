@@ -1,4 +1,13 @@
-ls ./*.ss | wc -l
+# results dir
 ss=/home/biolab/zzp/Human/secondary_structure/
-mv *.ss *.ss2 *.horiz ${ss}
+
+# if exists results, count, and mv to results dir
+if ls *.ss >/dev/null 2>& 1; then
+    ls ./*.ss | wc -l
+    mv *.ss ${ss}
+    mv *.ss2 ${ss}
+    mv *.horiz ${ss}
+fi
+
+# count results.
 ls ${ss}/*.ss | wc -l
