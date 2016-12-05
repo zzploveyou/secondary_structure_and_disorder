@@ -6,3 +6,7 @@
 *.pyc
 *.chk
 *.blast
+*.aux
+*.mn
+*.pn
+*.sn
