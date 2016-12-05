@@ -14,10 +14,10 @@ mylog = log.Terminal_log(brief=False)
 PSIPRED = '/home/biolab/zzp/program/PSIPRED/4.01/runpsipred'
 RESULT_DIR = '/home/biolab/zzp/Human/secondary_structure/'
 
-def psipred(fastafile):
+def psipred(fastafile, seqlen):
     idd = os.path.basename(fastafile).split('.')[0]
     order = " ".join((PSIPRED, fastafile))
-    mylog.info("add JOB: %s" % fastafile)
+    mylog.info("add JOB: %s, length: %d" % (os.path.basename(fastafile), seqlen))
     os.system(order)
     return idd
 
@@ -25,10 +25,10 @@ def seq_len(filename):
     for rec in SeqIO.parse(filename, "fasta"):
         return len(rec.seq)
 
-def cal(seqdir):
+def cal(seqdir, process):
 
     start = time.time()
-    pool = multiprocessing.Pool(processes=16)
+    pool = multiprocessing.Pool(processes=process)
     results = []
 
     filenames = []
@@ -44,7 +44,7 @@ def cal(seqdir):
     """short length sequence first"""
     filenames.sort()
     for seqlen, filename in filenames:
-        results.append(pool.apply_async(psipred, (filename,)))
+        results.append(pool.apply_async(psipred, (filename, seqlen,)))
     
     num = 0
     for r in results:
@@ -58,10 +58,11 @@ def cal(seqdir):
     mylog.done("done.")
     # 注意psipred结果位置.
     order = " ".join(("mv", "*.ss", "*.ss2", "*.horiz", "%s" % RESULT_DIR))
+    os.system(order)
 
     
 if __name__ == "__main__":
     seqdir = "/home/biolab/zzp/Human/sequences/"
     """make sure assert below in case of errors."""
     assert os.path.realpath(os.path.dirname(__file__)) == os.getcwd()
-    cal(seqdir)
+    cal(seqdir, process=20)
