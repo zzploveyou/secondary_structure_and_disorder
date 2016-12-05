@@ -1,0 +1,4 @@
+ls ./*.ss | wc -l
+ss=/home/biolab/zzp/Human/secondary_structure/
+mv *.ss *.ss2 *.horiz ${ss}
+ls ${ss}/*.ss | wc -l
