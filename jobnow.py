@@ -16,7 +16,7 @@ import time
 import sys
 
 FORMAT = '%H:%M:%S'
-PFORMAT = '  {:0>2s} {:^8s} {:^5s} {:^10s} {:^20s}'
+PFORMAT = '  {:0>2s} {:^8s} {:^12s} {:^10s} {:^20s}'
 
 def htime(timestamp):
     tt = datetime.datetime.fromtimestamp(timestamp)
