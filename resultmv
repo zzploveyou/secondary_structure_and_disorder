@@ -7,6 +7,7 @@ if ls *.ss >/dev/null 2>& 1; then
     mv *.ss ${ss}
     mv *.ss2 ${ss}
     mv *.horiz ${ss}
+    mv *.mat ${ss}
 fi
 
 # count results.
