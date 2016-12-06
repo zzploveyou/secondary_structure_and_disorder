@@ -65,4 +65,4 @@ if __name__ == "__main__":
     seqdir = "/home/biolab/zzp/Human/sequences/"
     """make sure assert below in case of errors."""
     assert os.path.realpath(os.path.dirname(__file__)) == os.getcwd()
-    cal(seqdir, process=20)
+    cal(seqdir, process=24)
