@@ -16,7 +16,7 @@ import time
 import sys
 
 FORMAT = '%H:%M:%S'
-PFORMAT = '  {:0>2s} {:^8s} {:^12s} {:^10s} {:^20s}'
+PFORMAT = '  {:0>2s} {:05.2f} {:^10s} {:^12s} {:^11s} {:^20s}'
 
 def htime(timestamp):
     tt = datetime.datetime.fromtimestamp(timestamp)
@@ -24,18 +24,20 @@ def htime(timestamp):
 
 def jobnow(dirs="."):
     print
-    print PFORMAT.format('id', 'mtime', 'uni-id', 'seqlen', 'blastfile')
+    print '  {:0>2s} {:^8s} {:^8s} {:^12s} {:^10s} {:^20s}'.format('id', 'WT(min)', 'mtime', 'uni-id', 'seqlen', 'blastfile')
     idds = []
     for filename in glob(os.path.join(dirs, "*.fasta")):
         for sec in SeqIO.parse(filename, 'fasta'):
             idd = sec.id.split("|")[1]
             length = len(sec.seq)
         blastfile = os.path.splitext(filename)[0] + ".blast"
-        idds.append((os.path.getmtime(blastfile), idd, length, filename))
+        # working time: wtime
+        idds.append((time.time()-os.path.getatime(filename),
+            os.path.getmtime(blastfile), idd, length, filename))
     idds.sort(reverse=True)
     idx = 1
-    for mtime, idd, length, filename in idds:
-        print PFORMAT.format(str(idx), htime(mtime), idd, str(length), filename)
+    for wtime, mtime, idd, length, filename in idds:
+        print PFORMAT.format(str(idx), wtime*1.0/60, htime(mtime), idd, str(length), filename)
         idx += 1
     print
 
