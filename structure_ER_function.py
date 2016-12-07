@@ -142,13 +142,13 @@ class SS:
         
 
 if __name__ == '__main__':        
-    for filename in glob(os.path.join(SS_DIR, "P86397.mat")):
+    for filename in glob(os.path.join(SS_DIR, "*.mat")):
         idd = os.path.basename(filename)[:-4]
         mylog.info(idd)
         s = SS(idd)
         if s.tag == 1:
             s.run()
-            raw_input()
+            # raw_input()
         else:
             mylog.warn("%s not run." %(idd))
         

@@ -1,3 +1,6 @@
+# coding:utf-8
+"""run anchor program for each sequence."""
+
 import os
 from glob import glob
 import log
