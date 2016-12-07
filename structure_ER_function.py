@@ -10,13 +10,18 @@ from glob import glob
 import json
 import log
 import math
+from Bio import SeqIO
 
 mylog = log.Terminal_log()
 PATH = "/home/biolab/zzp/Human"
 SS_DIR = os.path.join(PATH, "secondary_structure")
 DIS_DIR = os.path.join(PATH, "disorder")
-ER_DIR = os.path.join(PATH, "ER")
-RET_DIR = os.path.join(PATH, "ER-SS")
+D2P2_DIR = os.path.join(PATH, "D2P2")
+
+RET_DIR = os.path.join(PATH, "RET")
+
+
+
 
 class SS:
 
@@ -31,6 +36,7 @@ class SS:
         self.er = []
         # self.m存放各种结构的长度以及平均er值
         self.m = {'D':[0,0],'A':[0,0],'C':[0,0], 'E':[0,0], 'H':[0,0]}
+        
         self.tag = 1
         self.result = {}
         if not os.path.exists(self.ssfile):
@@ -99,6 +105,29 @@ class SS:
         for i in self.m:
             if self.m[i][0] != 0:
                 self.m[i][1] /= self.m[i][0]
+    def d2p2_exam(self):
+        d2p2id = ""
+        for line in open(os.path.join(D2P2_DIR, "d2p2_protein_to_uniprot.tsv")):
+            tmp = line.strip().split()
+            if tmp[1] == self.idd:
+                d2p2id = tmp[0]
+                break
+        if d2p2id == "":mylog.error("not exists d2p2id_uniprot.")
+        mylog.debug("d2p2id: %s" %(d2p2id))
+        tag = 0
+        for rec in SeqIO.parse(os.path.join(D2P2_DIR, "human.fasta"), "fasta"):
+            if rec.id == d2p2id:
+                tag = 1
+                if len(rec.seq) != len(self.ss):
+                    mylog.debug("d2p2 length: %s, ss length: %s" % (len(rec.seq), len(self.ss)))
+                    
+                    mylog.error("d2p2 length not equals us")
+                    return False
+        if tag == 1:
+            mylog.debug("d2p2 length equals us.")
+        else:
+            mylog.warn("can found d2p2")
+        return True
 
     def run(self):
         self.readss()
@@ -108,17 +137,20 @@ class SS:
         self.result['ss'] = self.ss
         self.result['er'] = self.er
         self.result['map'] = self.m
+        self.d2p2_exam()
         # print json.dumps(self.result, sort_keys=False, indent=4)
         fp = open(os.path.join(RET_DIR, self.idd+".json"), 'w')
         json.dump(self.result, fp, indent=4)
         
 
 if __name__ == '__main__':        
-    for filename in glob(os.path.join(SS_DIR, "*.mat")):
+    for filename in glob(os.path.join(SS_DIR, "Q9NQG1.mat")):
         idd = os.path.basename(filename)[:-4]
         mylog.info(idd)
         s = SS(idd)
         if s.tag == 1:
             s.run()
+        raw_input()
+        
 
 
