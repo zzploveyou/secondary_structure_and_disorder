@@ -71,11 +71,17 @@ class Terminal_log:
             self.__ERROR__ = ""
             self.__FATAL__ = ""
             self.__DONE__ = ""
+        
         self._logfilename = logfilename
         self._tag = tag
         self.time = time
         self.timeformat = timeformat
         self._brief = brief
+        
+        if self._logfilename:
+            fw = open(self._logfilename, 'a')
+            fw.write('############### %s ###############\n' %gettime(format=self.timeformat))
+            fw.close()
 
     def __logfw__(self, msg):
         """
