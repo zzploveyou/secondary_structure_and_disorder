@@ -3,6 +3,7 @@
 compare evolutionary rate in 
 different structures(disorder(D), ambigous(A), coil(C), sheet(E), helix(H))
 for each sequence.
+in mobidb, C means Anbiguous.
 """
 import os
 import sys
@@ -74,13 +75,13 @@ class SS:
         #self.disfile = "123.json"
         js = json.load(open(self.disfile))
         disorder = js['consensus']['full']
+        m = {'C':'A', 'd':'D'}
         for son in disorder:
             ann = son['ann']
             start = int(son['start'])-1
             end = int(son['end'])-1
-            if ann == 'A' or ann == 'D' or ann == 'd':
-                ann = ann.upper()
-                self.changess(start, end, ann)
+            if ann in m: ann = m[ann]
+            self.changess(start, end, ann)
         
     def printss(self):
         """返回加入disorder信息的序列结构"""
