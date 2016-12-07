@@ -17,6 +17,7 @@ PATH = "/home/biolab/zzp/Human"
 SS_DIR = os.path.join(PATH, "secondary_structure")
 DIS_DIR = os.path.join(PATH, "disorder")
 D2P2_DIR = os.path.join(PATH, "D2P2")
+ANCHOR_DIR = os.path.join(PATH, "ANCHOR")
 
 RET_DIR = os.path.join(PATH, "RET")
 
@@ -30,10 +31,14 @@ class SS:
         self.matfile = os.path.join(SS_DIR, idd + ".mat")
         self.ssfile = os.path.join(SS_DIR, idd + ".ss2")
         self.disfile = os.path.join(DIS_DIR, idd + ".json")
+        # self.seq存放序列
+        self.seq = []
         # self.ss存放结构信息, D,A,C,E,H
         self.ss = []
         # self.er存放保守率
         self.er = []
+        # self.anchor存放anchor概率
+        self.anchor = []
         # self.m存放各种结构的长度以及平均er值
         self.m = {'D':[0,0],'A':[0,0],'C':[0,0], 'E':[0,0], 'H':[0,0]}
         
@@ -51,6 +56,7 @@ class SS:
         for line in open(self.ssfile):
             tmp = line.strip().split()
             if len(tmp) == 6:
+                self.seq.append(tmp[1])
                 self.ss.append(tmp[2])
 
     def changess(self, start, end, tag):
@@ -105,52 +111,46 @@ class SS:
         for i in self.m:
             if self.m[i][0] != 0:
                 self.m[i][1] /= self.m[i][0]
-    def d2p2_exam(self):
-        d2p2id = ""
-        for line in open(os.path.join(D2P2_DIR, "d2p2_protein_to_uniprot.tsv")):
-            tmp = line.strip().split()
-            if tmp[1] == self.idd:
-                d2p2id = tmp[0]
-                break
-        if d2p2id == "":mylog.error("not exists d2p2id_uniprot.")
-        mylog.debug("d2p2id: %s" %(d2p2id))
-        tag = 0
-        for rec in SeqIO.parse(os.path.join(D2P2_DIR, "human.fasta"), "fasta"):
-            if rec.id == d2p2id:
-                tag = 1
-                if len(rec.seq) != len(self.ss):
-                    mylog.debug("d2p2 length: %s, ss length: %s" % (len(rec.seq), len(self.ss)))
-                    
-                    mylog.error("d2p2 length not equals us")
-                    return False
-        if tag == 1:
-            mylog.debug("d2p2 length equals us.")
-        else:
-            mylog.warn("can found d2p2")
-        return True
-
+    
+    def readanchor(self):
+        for line in open(os.path.join(ANCHOR_DIR, self.idd+".out")):
+            if line[0] != "#":
+                self.anchor.append(float(line.strip().split()[2]))
+ 
     def run(self):
+        # 二级结构
         self.readss()
+        # disorder信息
         self.readdis()
+        # 保守率
         self.caler()
-        self.getmap()
-        self.result['ss'] = self.ss
-        self.result['er'] = self.er
-        self.result['map'] = self.m
-        self.d2p2_exam()
-        # print json.dumps(self.result, sort_keys=False, indent=4)
-        fp = open(os.path.join(RET_DIR, self.idd+".json"), 'w')
-        json.dump(self.result, fp, indent=4)
+        # anchor
+        self.readanchor()
+        # self.getmap()
+        result = ["#Residue;Structure;Conserved-Rate;Anchor-Rate;\n"]
+        assert len(self.seq) == len(self.ss)
+        assert len(self.seq) == len(self.er) 
+        assert len(self.seq) == len(self.anchor)
+        for X, ss, er, an in zip(self.seq, self.ss, self.er, self.anchor):
+            result.append("{:s} {:s} {:.3f} {:.3f}\n".format(X, ss, er, an))
+        fw = open(os.path.join(RET_DIR, self.idd+".ret"), 'w')
+        fw.writelines(result)
+        fw.close()
+        
+        #fp = open(os.path.join(RET_DIR, self.idd+".json"), 'w')
+        #json.dump(self.result, fp, indent=4)
         
 
 if __name__ == '__main__':        
-    for filename in glob(os.path.join(SS_DIR, "Q9NQG1.mat")):
+    for filename in glob(os.path.join(SS_DIR, "P86397.mat")):
         idd = os.path.basename(filename)[:-4]
         mylog.info(idd)
         s = SS(idd)
         if s.tag == 1:
             s.run()
-        raw_input()
+            raw_input()
+        else:
+            mylog.warn("%s not run." %(idd))
         
 
 
