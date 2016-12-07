@@ -8,6 +8,9 @@ Description  :  log sth with tags and colors using ASSIC.
 
 '''
 
+def gettime(format="%m-%d %H:%M:%S"):
+    import datetime
+    return datetime.datetime.strftime(datetime.datetime.now(), format)
 
 class Terminal_log:
     """
@@ -29,7 +32,7 @@ class Terminal_log:
         done message.
     """
 
-    def __init__(self, logfilename=None, tag=True, color=True, brief=False):
+    def __init__(self, logfilename=None, tag=True, color=True, time=True, timeformat="%H:%M:%S", brief=False):
         """
         constructor of Terminal_log.
 
@@ -44,6 +47,12 @@ class Terminal_log:
         color: bool
             default: True
             log without colors if it's false.
+        time: bool
+            default: True
+            log with time if it's true.
+        timeformat: str
+            default: "%m-%d %H:%M:%S"
+            time format for log time.
         brief: bool
             default: False
             don't print debug log if it's true.
@@ -64,6 +73,8 @@ class Terminal_log:
             self.__DONE__ = ""
         self._logfilename = logfilename
         self._tag = tag
+        self.time = time
+        self.timeformat = timeformat
         self._brief = brief
 
     def __logfw__(self, msg):
@@ -96,6 +107,8 @@ class Terminal_log:
         [d] this is debug
         """
         if not self._brief:
+            if self.time:
+                msg = "%s %s" %(gettime(format=self.timeformat), msg)
             msg = "[d] " + msg
             print msg
             if self._logfilename:
@@ -116,6 +129,8 @@ class Terminal_log:
         >>> mylog.info("this is info")
         \033[32m[+] this is info\033[0m
         """
+        if self.time:
+            msg = "%s %s" %(gettime(format=self.timeformat), msg)
         if self._tag:
             msg = "[+] " + msg
         result = self.__INFO__ + msg + self.__ENDC__
@@ -138,6 +153,8 @@ class Terminal_log:
         >>> mylog.warn("this is warn")
         \033[33m[!] this is warn\033[0m
         """
+        if self.time:
+            msg = "%s %s" %(gettime(format=self.timeformat), msg)
         if self._tag:
             msg = "[!] " + msg
         result = self.__WARN__ + msg + self.__ENDC__
@@ -160,6 +177,8 @@ class Terminal_log:
         >>> mylog.error("this is error")
         \033[31m[-] this is error\033[0m
         """
+        if self.time:
+            msg = "%s %s" %(gettime(format=self.timeformat), msg)
         if self._tag:
             msg = "[-] " + msg
         result = self.__ERROR__ + msg + self.__ENDC__
@@ -182,6 +201,8 @@ class Terminal_log:
         >>> mylog.fatal("this is fatal error")
         \033[35m[×] this is fatal error\033[0m
         """
+        if self.time:
+            msg = "%s %s" %(gettime(format=self.timeformat), msg)
         if self._tag:
             msg = "[×] " + msg
         result = self.__FATAL__ + msg + self.__ENDC__
@@ -204,6 +225,8 @@ class Terminal_log:
         >>> mylog.done("done.")
         \033[35m[✓] done.\033[0m
         """
+        if self.time:
+            msg = "%s %s" %(gettime(format=self.timeformat), msg)
         if self._tag:
             msg = "[✓] " + msg
         result = self.__DONE__ + msg + self.__ENDC__
@@ -215,7 +238,7 @@ if __name__ == '__main__':
     """
     test Terminal_log
     """
-    m = Terminal_log(color=True)
+    m = Terminal_log(color=True, timeformat="%H:%M:%S")
     m.debug("this is debug")
     m.info("this is info")
     m.warn("this is warn")
