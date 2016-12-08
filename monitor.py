@@ -26,7 +26,7 @@ def jobnow(dirs="."):
     print
     print '  {:0>2s} {:^8s} {:^8s} {:^12s} {:^10s} {:^20s}'.format('id', 'WT(min)', 'mtime', 'uni-id', 'seqlen', 'blastfile')
     idds = []
-    for filename in glob(os.path.join(dirs, "*.fasta")):
+    for filename in glob(os.path.join(dirs, "psitmp*.fasta")):
         for sec in SeqIO.parse(filename, 'fasta'):
             idd = sec.id.split("|")[1]
             length = len(sec.seq)
