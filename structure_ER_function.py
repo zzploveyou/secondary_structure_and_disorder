@@ -13,7 +13,7 @@ import log
 import math
 from Bio import SeqIO
 
-mylog = log.Terminal_log()
+mylog = log.Terminal_log(brief=True)
 PATH = "/home/biolab/zzp/Human"
 SS_DIR = os.path.join(PATH, "secondary_structure")
 DIS_DIR = os.path.join(PATH, "disorder")
@@ -94,7 +94,7 @@ class SS:
         for i in args:
             if i != 0:
                 s += (-i*math.log(i, 2))
-        return s 
+        return s/log(20 ,2) 
 
     def caler(self):
         """读取PSSM矩阵,并计算序列各个残基的保守性"""
@@ -106,7 +106,10 @@ class SS:
         
     def getmap(self):
         """计算不同结构的长度,以及平均的保守性变化"""
-        assert len(self.ss) == len(self.er)
+        try:
+            assert len(self.ss) == len(self.er)
+        except Exception as e:
+            mylog.fatal(e)
         for ss,er in zip(self.ss, self.er):
             self.m[ss][0] += 1
             self.m[ss][1] += er
@@ -132,7 +135,10 @@ class SS:
         result = ["#Residue;Structure;Conserved-Rate;Anchor-Rate;\n"]
         assert len(self.seq) == len(self.ss)
         assert len(self.seq) == len(self.er) 
-        assert len(self.seq) == len(self.anchor)
+        try:
+            assert len(self.seq) == len(self.anchor)
+        except Exception as e:
+            mylog.error("len(self.seq):%s, len(self.anchor):%s" %(len(self.seq), len(self.anchor)))
         for X, ss, er, an in zip(self.seq, self.ss, self.er, self.anchor):
             result.append("{:s} {:s} {:.3f} {:.3f}\n".format(X, ss, er, an))
         fw = open(os.path.join(RET_DIR, self.idd+".ret"), 'w')
