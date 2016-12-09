@@ -32,7 +32,8 @@ class Terminal_log:
         done message.
     """
 
-    def __init__(self, logfilename=None, tag=True, color=True, time=True, timeformat="%H:%M:%S", brief=False):
+    def __init__(self, logfilename=None, tag=True, color=True, time=True,
+            timeformat="%H:%M:%S", brief=False, logfiletitle="#"*10+" {:s} "+"#"*10):
         """
         constructor of Terminal_log.
 
@@ -56,6 +57,9 @@ class Terminal_log:
         brief: bool
             default: False
             don't print debug log if it's true.
+        logfiletitle: format str.
+            default: "#"*10+" {:s} "+"#"*10
+            start title format of log file. ("{:s} means time.")
         """
         if color:
             self.__ENDC__ = "\033[0m"
@@ -77,10 +81,11 @@ class Terminal_log:
         self.time = time
         self.timeformat = timeformat
         self._brief = brief
+        self._logfiletitle = logfiletitle + "\n"
         
         if self._logfilename:
             fw = open(self._logfilename, 'a')
-            fw.write('############### %s ###############\n' %gettime(format=self.timeformat))
+            fw.write(self._logfiletitle.format(gettime(format=self.timeformat)))
             fw.close()
 
     def __logfw__(self, msg):
