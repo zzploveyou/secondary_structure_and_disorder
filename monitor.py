@@ -32,7 +32,7 @@ def jobnow(dirs="."):
             length = len(sec.seq)
         blastfile = os.path.splitext(filename)[0] + ".blast"
         # working time: wtime
-        idds.append((time.time()-os.path.getatime(filename),
+        idds.append((time.time()-os.path.getctime(filename),
             os.path.getmtime(blastfile), idd, length, filename))
     idds.sort(reverse=True)
     idx = 1
