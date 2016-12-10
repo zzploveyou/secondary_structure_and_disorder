@@ -42,6 +42,8 @@ class SS:
         self.anchor = []
         # self.m存放各种结构的长度以及平均er值
         self.m = {'D':[0,0],'A':[0,0],'C':[0,0], 'E':[0,0], 'H':[0,0]}
+        # self.ptm 存放PTM信息
+        self.ptm = ("notype", -1)
         
         self.tag = 1
         self.result = {}
@@ -94,7 +96,7 @@ class SS:
         for i in args:
             if i != 0:
                 s += (-i*math.log(i, 2))
-        return s/log(20 ,2) 
+        return s/math.log(20, 2) 
 
     def caler(self):
         """读取PSSM矩阵,并计算序列各个残基的保守性"""
@@ -121,7 +123,14 @@ class SS:
         for line in open(os.path.join(ANCHOR_DIR, self.idd+".out")):
             if line[0] != "#":
                 self.anchor.append(float(line.strip().split()[2]))
- 
+    
+    def getptm(self):
+        for line in open(os.path.join(D2P2_DIR, "PTM_human.txt" )):
+            tmp = line.strip().split("\t")
+            if tmp[0] == self.idd:
+                self.ptm = (tmp[1], tmp[2])
+                break
+
     def run(self):
         # 二级结构
         self.readss()
@@ -131,8 +140,15 @@ class SS:
         self.caler()
         # anchor
         self.readanchor()
+        # PTM
+        self.getptm()
+
         # self.getmap()
         result = ["#Residue;Structure;Conserved-Rate;Anchor-Rate;\n"]
+        result.append('#PTM type and position as below:\n')
+        position = int(self.ptm[1]) - 1
+        mylog.info("PTM position: %d" %(position))
+        result.append("#@%s %s %s %s %s\n" % (self.ptm[0], position, self.ss[position], self.er[position], self.anchor[position]))
         assert len(self.seq) == len(self.ss)
         assert len(self.seq) == len(self.er) 
         try:
