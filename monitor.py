@@ -6,7 +6,10 @@ For what:
 Usage:
     start this script, if some process mtime don't change,
     then you can kill the process.
-
+WT:
+    wait time.
+MT:
+    modificated time.
 """
 from Bio import SeqIO
 import os
@@ -16,20 +19,27 @@ import time
 import sys
 
 FORMAT = '%H:%M:%S'
-PFORMAT = '  {:0>2s} {:05.2f} {:^10s} {:^12s} {:^11s} {:^20s}'
+PFORMAT = '  {:0>2s} {:05.1f} {:^11s} {:^12s} {:^11s} {:^20s}'
+
+LENs = {}
 
 def htime(timestamp):
     tt = datetime.datetime.fromtimestamp(timestamp)
     return tt.strftime(FORMAT)
 
 def jobnow(dirs="."):
+    global LENs
     print
-    print '  {:0>2s} {:^8s} {:^8s} {:^12s} {:^10s} {:^20s}'.format('id', 'WT(min)', 'mtime', 'uni-id', 'seqlen', 'blastfile')
+    print '  {:0>2s} {:^6s} {:^10s} {:^12s} {:^10s} {:^20s}'.format('id', 'WT', 'MT', 'uni-id', 'seqlen', 'blastfile')
     idds = []
     for filename in glob(os.path.join(dirs, "psitmp*.fasta")):
-        for sec in SeqIO.parse(filename, 'fasta'):
-            idd = sec.id.split("|")[1]
-            length = len(sec.seq)
+        if filename not in LENs:
+            for sec in SeqIO.parse(filename, 'fasta'):
+                idd = sec.id.split("|")[1]
+                length = len(sec.seq)
+                LENs[filename] = (idd, length)
+        idd = LENs[filename][0]
+        length = LENs[filename][1]
         blastfile = os.path.splitext(filename)[0] + ".blast"
         # working time: wtime
         idds.append((time.time()-os.path.getctime(filename),
