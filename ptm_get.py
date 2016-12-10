@@ -1,10 +1,12 @@
 from Bio import SeqIO
+import os
+HD = "/home/biolab/zzp/Human/"
+d2p2_protein_to_uniprot_filename = os.path.join(HD, "D2P2/d2p2_protein_to_uniprot.tsv")
+d2p2_fastafile = os.path.join(HD, "D2P2/human.fasta")
+uni_fastafile = os.path.join(HD, "UP000005640_9606.fasta")
+ptm_filename = os.path.join(HD, "D2P2/ptm_assignment.tsv")
+ptm_result = os.path.join(HD, "D2P2/PTM_human.txt")
 
-d2p2_protein_to_uniprot_filename = "D2P2/d2p2_protein_to_uniprot.tsv"
-d2p2_fastafile = "D2P2/human.fasta"
-uni_fastafile = "UP000005640_9606.fasta"
-ptm_filename = "D2P2/ptm_assignment.tsv"
-ptm_result = "D2P2/PTM_human.txt"
 def getidlens(fastafile, tag="normal"):
     m = {}
     for rec in SeqIO.parse(fastafile, "fasta"):
