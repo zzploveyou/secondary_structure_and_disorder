@@ -84,6 +84,7 @@ class Terminal_log:
         self._logfiletitle = logfiletitle + "\n"
         
         if self._logfilename:
+            """ title of log file"""
             fw = open(self._logfilename, 'a')
             fw.write(self._logfiletitle.format(gettime(format=self.timeformat)))
             fw.close()
@@ -121,7 +122,7 @@ class Terminal_log:
             if self.time:
                 msg = "%s %s" %(gettime(format=self.timeformat), msg)
             msg = "[d] " + msg
-            print msg
+            print(msg)
             if self._logfilename:
                 self.__logfw__(msg)
 
