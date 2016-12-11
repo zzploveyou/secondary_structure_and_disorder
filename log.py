@@ -98,9 +98,10 @@ class Terminal_log:
         msg: str
             message that would be written to self._logfilename
         """
-        fw = open(self._logfilename, 'a')
-        fw.write(msg + "\n")
-        fw.close()
+        if self._logfilename:
+            fw = open(self._logfilename, 'a')
+            fw.write(msg + "\n")
+            fw.close()
 
     def debug(self, msg):
         """
@@ -123,8 +124,7 @@ class Terminal_log:
                 msg = "%s %s" %(gettime(format=self.timeformat), msg)
             msg = "[d] " + msg
             print(msg)
-            if self._logfilename:
-                self.__logfw__(msg)
+            self.__logfw__(msg)
 
     def info(self, msg):
         """
@@ -147,8 +147,7 @@ class Terminal_log:
             msg = "[+] " + msg
         result = self.__INFO__ + msg + self.__ENDC__
         print(result)
-        if self._logfilename:
-            self.__logfw__(msg)
+        self.__logfw__(msg)
 
     def warn(self, msg):
         """
@@ -171,8 +170,7 @@ class Terminal_log:
             msg = "[!] " + msg
         result = self.__WARN__ + msg + self.__ENDC__
         print(result)
-        if self._logfilename:
-            self.__logfw__(msg)
+        self.__logfw__(msg)
 
     def error(self, msg):
         """
@@ -195,8 +193,7 @@ class Terminal_log:
             msg = "[-] " + msg
         result = self.__ERROR__ + msg + self.__ENDC__
         print(result)
-        if self._logfilename:
-            self.__logfw__(msg)
+        self.__logfw__(msg)
 
     def fatal(self, msg):
         """
@@ -219,8 +216,7 @@ class Terminal_log:
             msg = "[×] " + msg
         result = self.__FATAL__ + msg + self.__ENDC__
         print(result)
-        if self._logfilename:
-            self.__logfw__(msg)
+        self.__logfw__(msg)
 
     def done(self, msg):
         """
@@ -243,14 +239,14 @@ class Terminal_log:
             msg = "[✓] " + msg
         result = self.__DONE__ + msg + self.__ENDC__
         print(result)
-        if self._logfilename:
-            self.__logfw__(msg)
+        self.__logfw__(msg)
 
 if __name__ == '__main__':
     """
     test Terminal_log
     """
-    m = Terminal_log(color=True, timeformat="%H:%M:%S")
+    m = Terminal_log(color=True, timeformat="%H:%M:%S",
+        logfilename="123.log")
     m.debug("this is debug")
     m.info("this is info")
     m.warn("this is warn")
