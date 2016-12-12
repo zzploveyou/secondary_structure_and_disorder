@@ -120,9 +120,8 @@ class Terminal_log:
         [d] this is debug
         """
         if not self._brief:
-            if self.time:
-                msg = "%s %s" %(gettime(format=self.timeformat), msg)
-            msg = "[d] " + msg
+            if self.time: msg = "%s %s" %(gettime(format=self.timeformat), msg)
+            if self._tag: msg = "[d] " + msg
             print(msg)
             self.__logfw__(msg)
 
@@ -141,10 +140,8 @@ class Terminal_log:
         >>> mylog.info("this is info")
         \033[32m[+] this is info\033[0m
         """
-        if self.time:
-            msg = "%s %s" %(gettime(format=self.timeformat), msg)
-        if self._tag:
-            msg = "[+] " + msg
+        if self.time: msg = "%s %s" %(gettime(format=self.timeformat), msg)
+        if self._tag: msg = "[+] " + msg
         result = self.__INFO__ + msg + self.__ENDC__
         print(result)
         self.__logfw__(msg)
@@ -164,10 +161,8 @@ class Terminal_log:
         >>> mylog.warn("this is warn")
         \033[33m[!] this is warn\033[0m
         """
-        if self.time:
-            msg = "%s %s" %(gettime(format=self.timeformat), msg)
-        if self._tag:
-            msg = "[!] " + msg
+        if self.time: msg = "%s %s" %(gettime(format=self.timeformat), msg)
+        if self._tag: msg = "[!] " + msg
         result = self.__WARN__ + msg + self.__ENDC__
         print(result)
         self.__logfw__(msg)
@@ -187,10 +182,8 @@ class Terminal_log:
         >>> mylog.error("this is error")
         \033[31m[-] this is error\033[0m
         """
-        if self.time:
-            msg = "%s %s" %(gettime(format=self.timeformat), msg)
-        if self._tag:
-            msg = "[-] " + msg
+        if self.time: msg = "%s %s" %(gettime(format=self.timeformat), msg)
+        if self._tag: msg = "[-] " + msg
         result = self.__ERROR__ + msg + self.__ENDC__
         print(result)
         self.__logfw__(msg)
@@ -210,10 +203,8 @@ class Terminal_log:
         >>> mylog.fatal("this is fatal error")
         \033[35m[×] this is fatal error\033[0m
         """
-        if self.time:
-            msg = "%s %s" %(gettime(format=self.timeformat), msg)
-        if self._tag:
-            msg = "[×] " + msg
+        if self.time: msg = "%s %s" %(gettime(format=self.timeformat), msg)
+        if self._tag: msg = "[×] " + msg
         result = self.__FATAL__ + msg + self.__ENDC__
         print(result)
         self.__logfw__(msg)
@@ -233,10 +224,8 @@ class Terminal_log:
         >>> mylog.done("done.")
         \033[35m[✓] done.\033[0m
         """
-        if self.time:
-            msg = "%s %s" %(gettime(format=self.timeformat), msg)
-        if self._tag:
-            msg = "[✓] " + msg
+        if self.time: msg = "%s %s" %(gettime(format=self.timeformat), msg)
+        if self._tag: msg = "[✓] " + msg
         result = self.__DONE__ + msg + self.__ENDC__
         print(result)
         self.__logfw__(msg)

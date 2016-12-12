@@ -43,7 +43,7 @@ class SS:
         # self.m存放各种结构的长度以及平均er值
         self.m = {'D':[0,0],'A':[0,0],'C':[0,0], 'E':[0,0], 'H':[0,0]}
         # self.ptm 存放PTM信息
-        self.ptm = ("notype", -1)
+        self.ptm = []
         
         self.tag = 1
         self.result = {}
@@ -125,11 +125,17 @@ class SS:
                 self.anchor.append(float(line.strip().split()[2]))
     
     def getptm(self):
+        self.ptm = ['None'] * len(self.seq)
         for line in open(os.path.join(D2P2_DIR, "PTM_human.txt" )):
             tmp = line.strip().split("\t")
-            if tmp[0] == self.idd:
-                self.ptm = (tmp[1], tmp[2])
-                break
+            idd, ty, pos, ami = tmp
+            pos = int(pos) - 1
+            if idd == self.idd:
+                if self.seq[pos] == ami and len(self.seq) > pos:
+                    self.ptm[pos] = ty
+                    mylog.info("pos right")
+                else:
+                    mylog.error("pos wrong.")
 
     def run(self):
         # 二级结构
@@ -144,19 +150,15 @@ class SS:
         self.getptm()
 
         # self.getmap()
-        result = ["#Residue;Structure;Conserved-Rate;Anchor-Rate;\n"]
-        result.append('#PTM type and position as below:\n')
-        position = int(self.ptm[1]) - 1
-        mylog.info("PTM position: %d" %(position))
-        result.append("#@%s %s %s %s %s\n" % (self.ptm[0], position, self.ss[position], self.er[position], self.anchor[position]))
+        result = ["#Residue;Structure;Conserved-Rate;Anchor-Rate;PTM type;\n"]
         assert len(self.seq) == len(self.ss)
         assert len(self.seq) == len(self.er) 
         try:
             assert len(self.seq) == len(self.anchor)
         except Exception as e:
             mylog.error("len(self.seq):%s, len(self.anchor):%s" %(len(self.seq), len(self.anchor)))
-        for X, ss, er, an in zip(self.seq, self.ss, self.er, self.anchor):
-            result.append("{:s} {:s} {:.3f} {:.3f}\n".format(X, ss, er, an))
+        for X, ss, er, an, ptm in zip(self.seq, self.ss, self.er, self.anchor, self.ptm):
+            result.append("{:s} {:s} {:.3f} {:.3f} {:s}\n".format(X, ss, er, an, ptm))
         fw = open(os.path.join(RET_DIR, self.idd+".ret"), 'w')
         fw.writelines(result)
         fw.close()
