@@ -1,3 +1,4 @@
+# coding:utf-8
 from Bio import SeqIO
 import os
 HD = "/home/biolab/zzp/Human/"
@@ -40,8 +41,9 @@ def main():
     lines = []
     for line in open(ptm_filename):
         tmp = line.strip().split("\t")
-        if tmp[2] in id_map:
-            lines.append("%s\t%s\t%s\n" % (id_map[tmp[2]], tmp[3], tmp[4]))
+        """在ptm file中搜索符合human的条目"""
+        if tmp[1] in id_map:
+            lines.append("%s\t%s\t%s\t%s\n" % (id_map[tmp[1]], tmp[3], tmp[4], tmp[5]))
     fw = open(ptm_result, 'w')
     fw.writelines(lines)
     fw.close()
