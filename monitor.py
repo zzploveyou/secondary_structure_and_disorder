@@ -44,7 +44,7 @@ def jobnow(dirs="."):
         # working time: wtime
         idds.append((time.time()-os.path.getctime(filename),
             os.path.getmtime(blastfile), idd, length, filename))
-    idds.sort(reverse=True)
+    idds.sort(reverse=False)
     idx = 1
     for wtime, mtime, idd, length, filename in idds:
         print PFORMAT.format(str(idx), wtime*1.0/60, htime(mtime), idd, str(length), filename)
