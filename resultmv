@@ -5,8 +5,17 @@ ss=/home/biolab/zzp/Human/secondary_structure/
 if ls *.ss >/dev/null 2>& 1; then
     ls ./*.ss | wc -l
     mv *.ss ${ss}
+fi
+
+if ls *.ss2 >/dev/null 2>& 1; then
     mv *.ss2 ${ss}
+fi
+
+if ls *.horiz >/dev/null 2>& 1; then
     mv *.horiz ${ss}
+fi
+
+if ls *.mat >/dev/null 2>& 1; then
     mv *.mat ${ss}
 fi
 
