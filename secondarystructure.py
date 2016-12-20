@@ -38,7 +38,7 @@ def cal(seqdir, process):
         f2 = os.path.join(RESULT_DIR, idd + ".horiz")
         f3 = os.path.join(RESULT_DIR, idd + ".mat")
         """not predicted."""
-        if not os.path.exists(f1) or not os.path.exists(f2)
+        if not os.path.exists(f1) or not os.path.exists(f2) \
             or not os.path.exists(f3):
             filenames.append((seq_len(filename), filename))
         else:
