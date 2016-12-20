@@ -166,17 +166,18 @@ class SS:
         #fp = open(os.path.join(RET_DIR, self.idd+".json"), 'w')
         #json.dump(self.result, fp, indent=4)
         
+def run(filename):
+    idd = os.path.basename(filename)[:-4]
+    mylog.info(idd)
+    s = SS(idd)
+    if s.tag == 1:
+        s.run()
+    else:
+        mylog.warn("%s not run." %(idd))
 
 if __name__ == '__main__':        
-    for filename in glob(os.path.join(SS_DIR, "*.mat")):
-        idd = os.path.basename(filename)[:-4]
-        mylog.info(idd)
-        s = SS(idd)
-        if s.tag == 1:
-            s.run()
-            # raw_input()
-        else:
-            mylog.warn("%s not run." %(idd))
-        
-
-
+    import threadpool
+    pool = threadpool.ThreadPool(1)
+    requests = threadpool.makeRequests(run, glob(os.path.join(SS_DIR, "*.mat")))
+    [pool.putRequest(req) for req in requests]
+    pool.wait()
