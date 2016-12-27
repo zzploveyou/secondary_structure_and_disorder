@@ -1,4 +1,5 @@
 # coding:utf-8
+
 """
 For what:
     ls job calculated now, sort by modificated time.
@@ -6,6 +7,8 @@ For what:
 Usage:
     start this script, if some process mtime don't change,
     then you can kill the process.
+PER:
+    percent progress, search, round1, round2
 WT:
     wait time.
 MT:
@@ -19,7 +22,7 @@ import time
 import sys
 
 FORMAT = '%H:%M:%S'
-PFORMAT = '  {:0>2s} {:05.1f} {:^11s} {:^12s} {:^11s} {:^20s}'
+PFORMAT = ' {:0>2s} {:^7s} {:^11s} {:^11s} {:>4s} {:^30s} {:^11s}'
 
 LENs = {}
 
@@ -30,7 +33,7 @@ def htime(timestamp):
 def jobnow(dirs="."):
     global LENs
     print
-    print '  {:0>2s} {:^6s} {:^10s} {:^12s} {:^10s} {:^20s}'.format('id', 'WT', 'MT', 'uni-id', 'seqlen', 'blastfile')
+    print PFORMAT.format('Id', 'Wait', 'Modified', 'UniID', 'len', 'blastfile', 'Progress(50)')
     idds = []
     for filename in glob(os.path.join(dirs, "psitmp*.fasta")):
         if filename not in LENs:
@@ -41,13 +44,31 @@ def jobnow(dirs="."):
         idd = LENs[filename][0]
         length = LENs[filename][1]
         blastfile = os.path.splitext(filename)[0] + ".blast"
+        f = open(blastfile).read()
+        n = f.count("Searching")
+        per = f.strip().split("\n")[-1].count(".")
+        per = str('{:02d}'.format(per))
+        
+        if 'Searching' not in f.strip().split("\n")[-1]:
+            """the last line confused"""
+            per = "pre"
+            n += 1
+        
+        if n == 3:
+            per = "\033[31mstep3 : \033[0m" + per
+        elif n == 2:
+            per = "\033[33mstep2 : \033[0m" + per
+        elif n == 1:
+            per = "\033[32mstep1 : \033[0m" + per
+        else:
+            per = "0"
         # working time: wtime
-        idds.append((time.time()-os.path.getctime(filename),
+        idds.append((time.time()-os.path.getctime(filename), per,
             os.path.getmtime(blastfile), idd, length, filename))
     idds.sort(reverse=False)
     idx = 1
-    for wtime, mtime, idd, length, filename in idds:
-        print PFORMAT.format(str(idx), wtime*1.0/60, htime(mtime), idd, str(length), filename)
+    for wtime, per, mtime, idd, length, filename in idds:
+        print PFORMAT.format('%02d' % idx, '{:05.1f}'.format(wtime*1.0/60), htime(mtime), idd, str(length), filename, per)
         idx += 1
     print
 
