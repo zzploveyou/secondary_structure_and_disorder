@@ -36,35 +36,39 @@ def jobnow(dirs="."):
     print PFORMAT.format('Id', 'Wait', 'Modified', 'UniID', 'len', 'blastfile', 'Progress(50)')
     idds = []
     for filename in glob(os.path.join(dirs, "psitmp*.fasta")):
-        if filename not in LENs:
-            for sec in SeqIO.parse(filename, 'fasta'):
-                idd = sec.id.split("|")[1]
-                length = len(sec.seq)
-                LENs[filename] = (idd, length)
-        idd = LENs[filename][0]
-        length = LENs[filename][1]
         blastfile = os.path.splitext(filename)[0] + ".blast"
-        f = open(blastfile).read()
-        n = f.count("Searching")
-        per = f.strip().split("\n")[-1].count(".")
-        per = str('{:02d}'.format(per))
-        
-        if 'Searching' not in f.strip().split("\n")[-1]:
-            """the last line confused"""
-            per = "pre"
-            n += 1
-        
-        if n == 3:
-            per = "\033[31mstep3 : \033[0m" + per
-        elif n == 2:
-            per = "\033[33mstep2 : \033[0m" + per
-        elif n == 1:
-            per = "\033[32mstep1 : \033[0m" + per
-        else:
-            per = "0"
-        # working time: wtime
-        idds.append((time.time()-os.path.getctime(filename), per,
-            os.path.getmtime(blastfile), idd, length, filename))
+        if os.path.exists(blastfile):
+            """sometimes not exist blastfile,"""
+            if filename not in LENs:
+                for sec in SeqIO.parse(filename, 'fasta'):
+                    idd = sec.id.split("|")[1]
+                    length = len(sec.seq)
+                    LENs[filename] = (idd, length)
+            idd = LENs[filename][0]
+            length = LENs[filename][1]
+            f = open(blastfile).read()
+            n = f.count("Searching")
+            per = f.strip().split("\n")[-1].count(".")
+            per = str('{:02d}'.format(per))
+            
+            if 'Searching' not in f.strip().split("\n")[-1]:
+                """the last line confused"""
+                per = "pre"
+                n += 1
+            
+            if n == 3:
+                per = "\033[31mstep3 : \033[0m" + per
+            elif n == 2:
+                per = "\033[33mstep2 : \033[0m" + per
+            elif n == 1:
+                per = "\033[32mstep1 : \033[0m" + per
+            elif n ==4:
+                per = "almost done"
+            else:
+                per = "0"
+            # working time: wtime
+            idds.append((time.time()-os.path.getctime(filename), per,
+                os.path.getmtime(blastfile), idd, length, filename))
     idds.sort(reverse=False)
     idx = 1
     for wtime, per, mtime, idd, length, filename in idds:
