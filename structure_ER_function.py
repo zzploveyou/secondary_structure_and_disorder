@@ -13,7 +13,7 @@ import log
 import math
 from Bio import SeqIO
 
-mylog = log.Terminal_log(brief=True)
+mylog = log.Terminal_log(logfilename='ret.log', brief=True)
 PATH = "/home/biolab/zzp/Human"
 SS_DIR = os.path.join(PATH, "secondary_structure")
 DIS_DIR = os.path.join(PATH, "disorder")
@@ -133,7 +133,7 @@ class SS:
             if idd == self.idd:
                 if self.seq[pos] == ami and len(self.seq) > pos:
                     self.ptm[pos] = ty
-                    mylog.info("pos right")
+                    # mylog.info("pos right")
                 else:
                     mylog.error("pos wrong.")
 
@@ -177,7 +177,7 @@ def run(filename):
 
 if __name__ == '__main__':        
     import threadpool
-    pool = threadpool.ThreadPool(1)
+    pool = threadpool.ThreadPool(24)
     requests = threadpool.makeRequests(run, glob(os.path.join(SS_DIR, "*.mat")))
     [pool.putRequest(req) for req in requests]
     pool.wait()
