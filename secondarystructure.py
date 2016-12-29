@@ -16,9 +16,13 @@ RESULT_DIR = '/home/biolab/zzp/Human/secondary_structure/'
 
 def psipred(fastafile, seqlen):
     idd = os.path.basename(fastafile).split('.')[0]
-    order = " ".join((PSIPRED, fastafile))
-    mylog.info("add JOB: %s, length: %d" % (os.path.basename(fastafile), seqlen))
-    os.system(order)
+    f1 = os.path.join(RESULT_DIR, idd + ".ss2")
+    f2 = os.path.join(RESULT_DIR, idd + ".mat")
+    if not os.path.exists(f1) or not os.path.exists(f2):
+        """exam if results already exists"""
+        order = " ".join((PSIPRED, fastafile))
+        mylog.info("add JOB: %s, length: %d" % (os.path.basename(fastafile), seqlen))
+        os.system(order)
     return idd
 
 def seq_len(filename):
@@ -35,11 +39,9 @@ def cal(seqdir, process):
     for filename in glob(os.path.join(seqdir, "*.fasta")):
         idd = os.path.basename(filename)[:-6]
         f1 = os.path.join(RESULT_DIR, idd + ".ss2")
-        f2 = os.path.join(RESULT_DIR, idd + ".horiz")
-        f3 = os.path.join(RESULT_DIR, idd + ".mat")
+        f2 = os.path.join(RESULT_DIR, idd + ".mat")
         """not predicted."""
-        if not os.path.exists(f1) or not os.path.exists(f2) \
-            or not os.path.exists(f3):
+        if not os.path.exists(f1) or not os.path.exists(f2):
             filenames.append((seq_len(filename), filename))
         else:
             mylog.debug("%s already predicted." %filename)
